@@ -5,10 +5,10 @@ namespace Model
 {
     public class Maze
     {
-        public int[][] MazeArray { get; private set; }
-        public int[,] MazeMDArray { get; private set; }
-        public int[] Begin { get; private set; }
-        public int[] End { get; private set; }
+        public int[][]? MazeArray { get; private set; }
+        public int[,]? MazeMDArray { get; private set; }
+        public int[]? Begin { get; private set; }
+        public int[]? End { get; private set; }
 
         public readonly int[][] moves = {           
             new int[] {  1,  0 },  //down
@@ -33,9 +33,79 @@ namespace Model
             if(rows % 2 != 0) {rows++;}
             if(cols % 2 != 0) {cols++;}
 
-            //ToDo...
+            // STEP 1: Initialize jagged array - fill with walls (-1)
+            MazeArray = new int[rows][];
+            for (int i = 0; i < rows; i++)
+            {
+                MazeArray[i] = new int[cols];
+                for (int j = 0; j < cols; j++)
+                {
+                    MazeArray[i][j] = -1; // All cells start as walls
+                }
+            }
 
-            GenerateFromText(MazeGrids.mazeText); //remove this line and implement the task
+            // STEP 2: Start DFS carving from position (1, 1)
+            CarvePassagesDFS(1, 1);
+
+            // STEP 3: Set start and end positions
+            Begin = [1, 1];
+            End = [rows - 2, cols - 2];
+            MazeArray[Begin[0]][Begin[1]] = 1;   // mark start
+            MazeArray[End[0]][End[1]] = 2;       // mark end
+
+            // STEP 3B: Convert jagged array to multidimensional array
+            MazeMDArray = new int[rows, cols];
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    MazeMDArray[i, j] = MazeArray[i][j];
+                }
+            }
+        }
+
+        void CarvePassagesDFS(int row, int col)
+        {
+            if (MazeArray == null) return;
+
+            // Mark current cell as passage (0 = carved/open)
+            MazeArray[row][col] = 0;
+
+            // Shuffle the directions to create random maze patterns
+            var directions = new int[][] { moves[0], moves[1], moves[2], moves[3] };
+            ShuffleArray(directions);
+
+            // Try each direction
+            foreach (var direction in directions)
+            {
+                int nextRow = row + direction[0] * 2;  // Move 2 cells to maintain walls
+                int nextCol = col + direction[1] * 2;
+
+                // Check if next position is valid and unvisited (wall)
+                if (IsValidPos(MazeArray, nextRow, nextCol) && MazeArray[nextRow][nextCol] == -1)
+                {
+                    // Carve wall between current and next cell
+                    int wallRow = row + direction[0];
+                    int wallCol = col + direction[1];
+                    MazeArray[wallRow][wallCol] = 0;  // carve passage through wall
+
+                    // Recursively carve from next cell
+                    CarvePassagesDFS(nextRow, nextCol);
+                }
+            }
+        }
+
+        void ShuffleArray(int[][] array)
+        {
+            Random random = new Random();
+            for (int i = array.Length - 1; i > 0; i--)
+            {
+                int randomIndex = random.Next(i + 1);
+                // Swap elements
+                var temp = array[i];
+                array[i] = array[randomIndex];
+                array[randomIndex] = temp;
+            }
         }
 
         int[][] ToMazeArray(string maze)

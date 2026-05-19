@@ -18,6 +18,8 @@ class Program
 
     static void Main()
     {
+      Console.OutputEncoding = System.Text.Encoding.UTF8;
+
         string mazeText = @"
 xxxxxx1xxxxxxxxxxxxxxxxxxxxxxx.
  x   x   x                    .
@@ -32,7 +34,7 @@ xxxx    xxxxx xx xxxx xxxxx xx.
 xx            xx            xx.";
 
         //-----------constants:------------
-        const int rows = 25, cols = 2*rows;
+        const int rows = 6, cols = 2*rows;
         const int timeInterval = 400;
         //---------------------------------
         
