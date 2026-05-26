@@ -45,7 +45,9 @@ namespace Model
             }
 
             // STEP 2: Start DFS carving from position (1, 1)
-            CarvePassagesDFS(1, 1);
+            // CarvePassagesDFS(1, 1);  // Uncomment to use DFS
+            // Or use Binary Tree algorithm instead:
+            CarvePassagesBinaryTree();
 
             // STEP 3: Set start and end positions
             Begin = [1, 1];
@@ -91,6 +93,48 @@ namespace Model
 
                     // Recursively carve from next cell
                     CarvePassagesDFS(nextRow, nextCol);
+                }
+            }
+        }
+
+        void CarvePassagesBinaryTree()
+        {
+            if (MazeArray == null) return;
+
+            int rows = MazeArray.Length;
+            int cols = MazeArray[0]?.Length ?? 0;
+            Random random = new Random();
+
+            // Iterate through each cell in the maze (using odd indices to skip walls)
+            for (int row = 1; row < rows; row += 2)
+            {
+                for (int col = 1; col < cols; col += 2)
+                {
+                    // Mark current cell as passage (0 = carved/open)
+                    MazeArray[row][col] = 0;
+
+                    // Determine available directions (up and left)
+                    var availableDirections = new List<int[]>();
+                    
+                    // Check if we can carve UP (not at top edge)
+                    if (row > 1)
+                        availableDirections.Add(moves[1]); // up
+                    
+                    // Check if we can carve LEFT (not at left edge)
+                    if (col > 1)
+                        availableDirections.Add(moves[2]); // left
+
+                    // If we have available directions, randomly choose one
+                    if (availableDirections.Count > 0)
+                    {
+                        int randomIndex = random.Next(availableDirections.Count);
+                        int[] chosenDirection = availableDirections[randomIndex];
+
+                        // Carve the wall between current cell and chosen neighbor
+                        int wallRow = row + chosenDirection[0];
+                        int wallCol = col + chosenDirection[1];
+                        MazeArray[wallRow][wallCol] = 0;
+                    }
                 }
             }
         }
