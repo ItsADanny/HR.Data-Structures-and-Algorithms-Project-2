@@ -51,8 +51,18 @@ namespace Model
 
             // STEP 3: Set start and end positions
             Begin = [1, 1];
-            End = [rows - 2, cols - 2];
             MazeArray[Begin[0]][Begin[1]] = 1;   // mark start
+            
+            // Set end at a random valid position (not a wall, not the begin position)
+            Random random = new Random();
+            int endRow, endCol;
+            do
+            {
+                endRow = random.Next(1, rows - 1);
+                endCol = random.Next(1, cols - 1);
+            } while (MazeArray[endRow][endCol] == -1 || (endRow == Begin[0] && endCol == Begin[1]));
+            
+            End = [endRow, endCol];
             MazeArray[End[0]][End[1]] = 2;       // mark end
 
             // STEP 3B: Convert jagged array to multidimensional array
