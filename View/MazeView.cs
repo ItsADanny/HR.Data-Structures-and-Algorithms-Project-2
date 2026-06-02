@@ -221,6 +221,8 @@ namespace View
 
             var toBeShownPositions = new Queue<int[]>(visitedPositions);
             var shownPositions = new Queue<int[]>();
+            // Dictionary to map position to symbol index
+            var positionToSymbolIndex = new Dictionary<string, int>();
 
             while (toBeShownPositions.Count > 0)
             {
@@ -230,6 +232,21 @@ namespace View
 
                 var currPos = toBeShownPositions.Dequeue();
                 shownPositions.Enqueue(currPos);
+
+                // Add new position with symbol at the end, shift all others forward
+                string newPosKey = $"{currPos[0]},{currPos[1]}";
+                
+                // Shift all existing symbol indices forward (toward beginning of queue)
+                var updatedMapping = new Dictionary<string, int>();
+                foreach (var kvp in positionToSymbolIndex)
+                {
+                    int newIndex = (kvp.Value + 1) % symbolsArr.Length;
+                    updatedMapping[kvp.Key] = newIndex;
+                }
+                positionToSymbolIndex = updatedMapping;
+                
+                // Add new position with first symbol (at end of queue)
+                positionToSymbolIndex[newPosKey] = 0;
 
                 //Marking strategy:
 
@@ -267,12 +284,17 @@ namespace View
                                 {
                                     Console.Write("⚽️");
                                 }
-                                else if (shownPositions.Any(_ => _[0] == rowIdx && _[1] == colIdx))
-                                {
-                                    Console.Write("🏃");
-                                }
                                 else
-                                    Console.Write("  ");
+                                {
+                                    string posKey = $"{rowIdx},{colIdx}";
+                                    if (positionToSymbolIndex.ContainsKey(posKey))
+                                    {
+                                        int symbolIndex = positionToSymbolIndex[posKey];
+                                        Console.Write(symbolsArr[symbolIndex]);
+                                    }
+                                    else
+                                        Console.Write("  ");
+                                }
                                 break;
                             //Marking strategy 
                             case 10:
@@ -285,7 +307,14 @@ namespace View
                                 }
                                 else
                                 {
-                                    Console.Write("🏃");
+                                    string posKey = $"{rowIdx},{colIdx}";
+                                    if (positionToSymbolIndex.ContainsKey(posKey))
+                                    {
+                                        int symbolIndex = positionToSymbolIndex[posKey];
+                                        Console.Write(symbolsArr[symbolIndex]);
+                                    }
+                                    else
+                                        Console.Write("🏃");
                                 }
                                 break;
                             default:
@@ -311,6 +340,8 @@ namespace View
 
             var toBeShownPositions = new Queue<int[]>(visitedPositions);
             var shownPositions = new Queue<int[]>();
+            // Dictionary to map position to symbol index
+            var positionToSymbolIndex = new Dictionary<string, int>();
 
             while (toBeShownPositions.Count > 0)
             {
@@ -320,6 +351,21 @@ namespace View
 
                 var currPos = toBeShownPositions.Dequeue();
                 shownPositions.Enqueue(currPos);
+
+                // Add new position with symbol at the end, shift all others forward
+                string newPosKey = $"{currPos[0]},{currPos[1]}";
+                
+                // Shift all existing symbol indices forward (toward beginning of queue)
+                var updatedMapping = new Dictionary<string, int>();
+                foreach (var kvp in positionToSymbolIndex)
+                {
+                    int newIndex = (kvp.Value + 1) % symbolsArr.Length;
+                    updatedMapping[kvp.Key] = newIndex;
+                }
+                positionToSymbolIndex = updatedMapping;
+                
+                // Add new position with first symbol (at end of queue)
+                positionToSymbolIndex[newPosKey] = 0;
 
                 //Marking strategy:
 
@@ -362,12 +408,17 @@ namespace View
                                 {
                                     Console.Write("⚽️");
                                 }
-                                else if (shownPositions.Any(_ => _[0] == rowIdx && _[1] == colIdx))
-                                {
-                                    Console.Write("🏃");
-                                }
                                 else
-                                    Console.Write("  ");
+                                {
+                                    string posKey = $"{rowIdx},{colIdx}";
+                                    if (positionToSymbolIndex.ContainsKey(posKey))
+                                    {
+                                        int symbolIndex = positionToSymbolIndex[posKey];
+                                        Console.Write(symbolsArr[symbolIndex]);
+                                    }
+                                    else
+                                        Console.Write("  ");
+                                }
                                 break;
                             //Marking strategy 
                             case 10:
@@ -380,7 +431,14 @@ namespace View
                                 }
                                 else
                                 {
-                                    Console.Write("🏃");
+                                    string posKey = $"{rowIdx},{colIdx}";
+                                    if (positionToSymbolIndex.ContainsKey(posKey))
+                                    {
+                                        int symbolIndex = positionToSymbolIndex[posKey];
+                                        Console.Write(symbolsArr[symbolIndex]);
+                                    }
+                                    else
+                                        Console.Write("🏃");
                                 }
                                 break;
                             default:
@@ -414,17 +472,17 @@ namespace View
             */
                 if (rnd.NextDouble() < 0.3)
                 {
-                    symbols[i] = "🦖";
+                    symbols[i] = "👾";
                 }
 
                 else if (rnd.NextDouble() < 0.7)
                 {
-                    symbols[i] = "🐈";
+                    symbols[i] = "👽";
                 }
 
                 else
                 {
-                    symbols[i] = "🦕";
+                    symbols[i] = "💩";
                 }
             }
 
