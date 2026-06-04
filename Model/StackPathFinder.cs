@@ -21,7 +21,7 @@ namespace Model
             var stack = new Stack<int[]>();
             stack.Push(pos);
 
-            // DFS using explicit stack
+            // DFS using stack
             while (stack.Count > 0)
             {
                 int[] current = stack.Pop();
@@ -48,7 +48,7 @@ namespace Model
                     return;
                 }
 
-                // Push all valid neighbors onto the stack (in reverse order for consistent exploration)
+                // Push all valid neighbors onto the stack
                 foreach (var move in maze.moves)
                 {
                     int nextRow = current[0] + move[0];
