@@ -21,6 +21,7 @@ namespace Model
             var priorityQueue = new PriorityQueue<int[], int>();
             var visited = new HashSet<string>();
 
+            // Initialize all distances to infinity
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < cols; j++)
@@ -35,7 +36,7 @@ namespace Model
             priorityQueue.Enqueue(pos, 0);
             parent[startKey] = null;
 
-            // Dijkstra's algorithm
+            // Find shortest path using Dijkstra's algorithm
             while (priorityQueue.Count > 0)
             {
                 int[] current = priorityQueue.Dequeue();

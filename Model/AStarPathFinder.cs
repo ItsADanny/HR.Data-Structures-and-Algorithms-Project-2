@@ -30,6 +30,7 @@ namespace Model
             var openSet = new PriorityQueue<int[], int>();
             var closedSet = new HashSet<string>();
 
+            // Initialize all g-scores to infinity
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < cols; j++)
@@ -45,6 +46,7 @@ namespace Model
             openSet.Enqueue(pos, startHeuristic);
             parent[startKey] = null;
 
+            // Find shortest path using A* algorithm
             while (openSet.Count > 0)
             {
                 int[] current = openSet.Dequeue();
@@ -59,7 +61,7 @@ namespace Model
 
                 if (current[0] == goalRow && current[1] == goalCol)
                 {
-                    // Reconstruct path from end to start
+                    // Reconstruct path
                     var path = new Stack<int[]>();
                     int[] node = current;
                     
