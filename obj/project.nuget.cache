@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "bBqxJdJfcjU=",
+  "success": true,
+  "projectFilePath": "/Users/dannydesnoo/Documents/GitHub/HR.Data-Structures-and-Algorithms-Project-2/MazeSolver.csproj",
+  "expectedPackageFiles": [
+    "/Users/dannydesnoo/.nuget/packages/microsoft.netcore.app.ref/8.0.22/microsoft.netcore.app.ref.8.0.22.nupkg.sha512",
+    "/Users/dannydesnoo/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.22/microsoft.aspnetcore.app.ref.8.0.22.nupkg.sha512",
+    "/Users/dannydesnoo/.nuget/packages/microsoft.netcore.app.host.osx-arm64/8.0.22/microsoft.netcore.app.host.osx-arm64.8.0.22.nupkg.sha512"
+  ],
+  "logs": []
+}
