@@ -25,20 +25,11 @@ namespace Model
             int goalRow = maze.End[0];
             int goalCol = maze.End[1];
 
-            // Dictionary to store g-score (cost from start)
             var gScore = new Dictionary<string, int>();
-            
-            // Dictionary to store parent nodes for path reconstruction
             var parent = new Dictionary<string, int[]>();
-            
-            // Priority queue: (f-score, position)
-            // f-score = g-score + heuristic
             var openSet = new PriorityQueue<int[], int>();
-            
-            // HashSet for closed set (visited nodes)
             var closedSet = new HashSet<string>();
 
-            // Initialize g-scores to infinity
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < cols; j++)
@@ -48,29 +39,24 @@ namespace Model
                 }
             }
 
-            // Start position
             string startKey = $"{pos[0]},{pos[1]}";
             gScore[startKey] = 0;
             int startHeuristic = Heuristic(pos[0], pos[1], goalRow, goalCol);
-            openSet.Enqueue(pos, startHeuristic); // f = 0 + h
+            openSet.Enqueue(pos, startHeuristic);
             parent[startKey] = null;
 
-            // A* algorithm
             while (openSet.Count > 0)
             {
                 int[] current = openSet.Dequeue();
                 string currentKey = $"{current[0]},{current[1]}";
 
-                // Skip if already visited
                 if (closedSet.Contains(currentKey))
                 {
                     continue;
                 }
 
-                // Mark as visited
                 closedSet.Add(currentKey);
 
-                // Check if we reached the end
                 if (current[0] == goalRow && current[1] == goalCol)
                 {
                     // Reconstruct path from end to start
@@ -92,7 +78,6 @@ namespace Model
                     return;
                 }
 
-                // Explore neighbors
                 int currentG = gScore[currentKey];
                 foreach (var move in maze.moves)
                 {
@@ -100,12 +85,10 @@ namespace Model
                     int nextCol = current[1] + move[1];
                     string nextKey = $"{nextRow},{nextCol}";
 
-                    // Check if valid move and not visited
                     if (maze.IsValidMove(nextRow, nextCol) && !closedSet.Contains(nextKey))
                     {
                         int newG = currentG + 1;
 
-                        // If we found a shorter path, update it
                         if (newG < gScore[nextKey])
                         {
                             gScore[nextKey] = newG;
