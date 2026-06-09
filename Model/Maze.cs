@@ -169,84 +169,101 @@ namespace Model
             int rows = MazeArray.Length;
             int cols = MazeArray[0]?.Length ?? 0;
             Random random = new Random();
+            
+            // Pre-calculate constants for odd cell positions
+            int maxRows = (rows - 1) / 2;
+            int maxCols = (cols - 1) / 2;
+            int totalCells = maxRows * maxCols;
 
-            // STEP 1: Mark all cells as unvisited (part of the maze algorithm)
-            // We'll use -1 for walls (unvisited by algorithm) and 0 for passages
+            // STEP 1: Track which cells are part of the maze
             bool[,] inMaze = new bool[rows, cols];
 
-            // STEP 2: Pick a random starting cell and mark it as part of the maze
-            int startRow = 1 + random.Next((rows - 1) / 2) * 2;  // Odd row
-            int startCol = 1 + random.Next((cols - 1) / 2) * 2;  // Odd column
+            // STEP 2: Start with a random cell already in the maze
+            int startRow = 1 + random.Next(maxRows) * 2;
+            int startCol = 1 + random.Next(maxCols) * 2;
             inMaze[startRow, startCol] = true;
             MazeArray[startRow][startCol] = 0;
-
-            // STEP 3: Pick random cells and carve paths to the maze using random walks
             int cellsInMaze = 1;
-            int totalCells = ((rows - 1) / 2) * ((cols - 1) / 2);
 
+            // STEP 3: Iteratively add cells to the maze via random walks
             while (cellsInMaze < totalCells)
             {
-                // Pick a random cell not yet in the maze
+                // Start from a random unvisited cell
                 int row, col;
                 do
                 {
-                    row = 1 + random.Next((rows - 1) / 2) * 2;
-                    col = 1 + random.Next((cols - 1) / 2) * 2;
+                    row = 1 + random.Next(maxRows) * 2;
+                    col = 1 + random.Next(maxCols) * 2;
                 } while (inMaze[row, col]);
 
-                // Perform random walk from this cell until we hit a cell in the maze
-                List<(int, int)> path = new List<(int, int)> { (row, col) };
-                (int currentRow, int currentCol) = (row, col);
-                Dictionary<(int, int), int> visited = new Dictionary<(int, int), int> { { (currentRow, currentCol), 0 } };
+                // Perform random walk until we connect to an existing maze cell
+                var path = new List<(int, int)> { (row, col) };
+                var pathSet = new HashSet<(int, int)> { (row, col) };
+                int currentRow = row;
+                int currentCol = col;
 
-                // Random walk until we hit the maze
+                // Walk until we hit a cell already in the maze
                 while (!inMaze[currentRow, currentCol])
                 {
-                    // Choose random direction
+                    // Take a step in a random direction
                     int[] direction = moves[random.Next(4)];
                     int nextRow = currentRow + direction[0] * 2;
                     int nextCol = currentCol + direction[1] * 2;
 
-                    // If out of bounds, retry from current position
-                    if (nextRow < 1 || nextRow >= rows - 1 || nextCol < 1 || nextCol >= cols - 1)
+                    // Skip if out of bounds
+                    if (nextRow < 1 || nextRow >= rows || nextCol < 1 || nextCol >= cols)
                         continue;
 
-                    // Check if we've been to this cell in this walk
-                    if (visited.ContainsKey((nextRow, nextCol)))
+                    // If we've encountered this cell before, we've found a loop
+                    if (pathSet.Contains((nextRow, nextCol)))
                     {
-                        // We've found a loop - remove the loop by truncating the path
-                        int loopStart = visited[(nextRow, nextCol)];
-                        while (path.Count > loopStart + 1)
-                            path.RemoveAt(path.Count - 1);
+                        // Find where the loop started and truncate path
+                        int loopIdx = 0;
+                        for (int i = 0; i < path.Count; i++)
+                        {
+                            if (path[i] == (nextRow, nextCol))
+                            {
+                                loopIdx = i;
+                                break;
+                            }
+                        }
+                        
+                        // Remove loop by keeping only up to loop start
+                        pathSet.Clear();
+                        for (int i = 0; i <= loopIdx; i++)
+                        {
+                            pathSet.Add(path[i]);
+                        }
+                        path.RemoveRange(loopIdx + 1, path.Count - loopIdx - 1);
                     }
                     else
                     {
-                        // Add to path and visited set
-                        visited[(nextRow, nextCol)] = path.Count;
+                        // New cell - add to path
                         path.Add((nextRow, nextCol));
+                        pathSet.Add((nextRow, nextCol));
                     }
 
                     currentRow = nextRow;
                     currentCol = nextCol;
                 }
 
-                // We've hit the maze! Add all cells in the path to the maze
+                // Add all cells in path to the maze and carve passages
                 for (int i = 0; i < path.Count; i++)
                 {
-                    (int row2, int col2) = path[i];
+                    (int cellRow, int cellCol) = path[i];
 
-                    if (!inMaze[row2, col2])
+                    if (!inMaze[cellRow, cellCol])
                     {
-                        inMaze[row2, col2] = true;
-                        MazeArray[row2][col2] = 0;
+                        inMaze[cellRow, cellCol] = true;
+                        MazeArray[cellRow][cellCol] = 0;
                         cellsInMaze++;
 
-                        // Carve passage between this cell and the next in the path
-                        if (i < path.Count - 1)
+                        // Carve wall between this cell and next cell in path
+                        if (i + 1 < path.Count)
                         {
                             (int nextRow, int nextCol) = path[i + 1];
-                            int wallRow = row2 + (nextRow - row2) / 2;
-                            int wallCol = col2 + (nextCol - col2) / 2;
+                            int wallRow = cellRow + (nextRow - cellRow) / 2;
+                            int wallCol = cellCol + (nextCol - cellCol) / 2;
                             MazeArray[wallRow][wallCol] = 0;
                         }
                     }
